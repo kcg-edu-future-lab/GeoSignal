@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>GeoSignal</title>
+    <script type="text/javascript" src="/Scripts/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery.signalR-2.2.3.min.js"></script>
+    <script type="text/javascript" src="/signalr/hubs"></script>
+    <style type="text/css">
+        #container {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #mapLayer {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="mapLayer"></div>
+    </div>
+
+    <script type='text/javascript'>
+        var geoHub = $.connection.geoHub;
+        geoHub.client.notifyPosition = updateMarkerPosition;
+        $.connection.hub.start();
+
+        var dateId = "ID" + new Date().toISOString();
+        console.log(dateId);
+
+        var map;
+        var center = { lat: 34.985, lng: 135.755 };
+        var markers = {};
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('mapLayer'), {
+                center: center,
+                zoom: 18
+            });
+        }
+
+        function updateMarkerPosition(id, lat, lng) {
+            var latlng = { lat: lat, lng: lng };
+            if (markers[id]) {
+                markers[id].setPosition(latlng);
+            } else {
+                markers[id] = new google.maps.Marker({
+                    map: map,
+                    position: latlng,
+                });
+            }
+        }
+
+        function updateSelfPosition() {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    geoHub.server.updatePosition(dateId, position.coords.latitude, position.coords.longitude);
+                    updateMarkerPosition(dateId, position.coords.latitude, position.coords.longitude);
+                });
+        }
+
+        if (navigator.geolocation) {
+            setInterval(updateSelfPosition, 1000);
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExOLb7FAYCD0YmpAWA8GfyV59MPOaWnY&callback=initMap"></script>
+</body>
+</html>

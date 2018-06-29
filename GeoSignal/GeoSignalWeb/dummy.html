@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>GeoSignal</title>
+    <script type="text/javascript" src="/Scripts/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="/Scripts/jquery.signalR-2.2.3.min.js"></script>
+    <script type="text/javascript" src="/signalr/hubs"></script>
+</head>
+<body>
+    <p>東に移動し続けます。</p>
+    <script type='text/javascript'>
+        var geoHub = $.connection.geoHub;
+        $.connection.hub.start();
+
+        var dateId = "ID" + new Date().toISOString();
+        console.log(dateId);
+
+        var lat = 34.985;
+        var lng = 135.75;
+
+        function updateSelfPosition() {
+            lng += 0.001;
+            geoHub.server.updatePosition(dateId, lat, lng);
+        }
+
+        if (navigator.geolocation) {
+            setInterval(updateSelfPosition, 1000);
+        }
+    </script>
+</body>
+</html>
