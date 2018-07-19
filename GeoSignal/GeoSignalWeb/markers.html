@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Markers Test</title>
+    <style type="text/css">
+        #container {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #mapLayer {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="mapLayer"></div>
+    </div>
+
+    <script type='text/javascript'>
+        var map;
+        var marker;
+        var center = { lat: 34.985, lng: 135.755 };
+        var position0 = { lat: 34.985, lng: 135.753 };
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('mapLayer'), {
+                center: center,
+                zoom: 18
+            });
+            new google.maps.Marker({
+                map: map,
+                position: position0
+            });
+        }
+
+        function updatePosition() {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    var latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    if (marker) {
+                        marker.setPosition(latlng);
+                    } else {
+                        marker = new google.maps.Marker({
+                            map: map,
+                            position: latlng
+                        });
+                    }
+                });
+        }
+
+        if (navigator.geolocation) {
+            setInterval(updatePosition, 1000);
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAExOLb7FAYCD0YmpAWA8GfyV59MPOaWnY&callback=initMap"></script>
+</body>
+</html>
